@@ -8,7 +8,6 @@
         const user = await pb
             .collection("users")
             .authWithPassword(username, password);
-        console.log(user);
     }
 
     async function signUp() {
@@ -18,7 +17,6 @@
                 password,
                 passwordConfirm: password,
             };
-            console.log(data);
             const createdUser = await pb.collection("users").create(data);
             await login();
         } catch (err) {
