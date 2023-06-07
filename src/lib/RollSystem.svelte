@@ -68,7 +68,7 @@
     }
 </script>
 
-<button on:click={rollForCard}> Roll : {$currentUser.roll_available} </button>
+<button id="rollBtn" on:click={rollForCard}> Roll : {$currentUser.roll_available} </button>
 
 <div id="rolledCards" />
 
@@ -79,5 +79,8 @@
         flex-wrap: wrap;
         justify-content: center;
         min-height: 205px;
+    }
+    #rollBtn{
+        margin: 20px;
     }
 </style>
