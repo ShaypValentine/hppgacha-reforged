@@ -78,5 +78,6 @@
         flex-direction: row;
         flex-wrap: wrap;
         justify-content: center;
+        min-height: 205px;
     }
 </style>
