@@ -4,11 +4,21 @@
     import { currentUser, pb } from "./pocketbase";
     import Card from "./Card.svelte";
     import { onMount } from "svelte";
+    import debounce from "lodash/debounce";
+
     onMount(async () => {
         await pb.collection("users").authRefresh();
     });
 
+    const handleRoll = debounce(rollForCard, 300, {
+        leading: false,
+        trailing: true,
+        maxWait: 300,
+    });
+
     async function rollForCard() {
+        const rollBtn = document.getElementById("rollBtn");
+        rollBtn.disabled = true;
         const user = await pb.collection("users").getOne($currentUser.id);
         if (user.roll_available > 0) {
             let randomCard = await pb
@@ -20,6 +30,8 @@
             });
 
             let rolledCard = randomCard.items[0];
+            await updateStatsAndInventory(user, rolledCard);
+
             const url = pb.files.getUrl(rolledCard, rolledCard.image);
             const rolledCards = document.getElementById("rolledCards");
 
@@ -37,8 +49,8 @@
             if (childrens.length > 6) {
                 rolledCards.removeChild(childrens[0]);
             }
-            await updateStatsAndInventory(user, rolledCard);
         }
+        rollBtn.disabled = false;
     }
 
     async function updateStatsAndInventory(user, card) {
@@ -59,16 +71,23 @@
                 });
             }
 
+            await pb.collection("common_cards").update(card.id, {
+                stats_rolled: card.stats_rolled + 1,
+            });
+
             await pb.collection("users").update(user.id, {
                 stats_total_roll: user.stats_total_roll + 1,
             });
+            console.log("updated");
         } catch (err) {
             console.log(err);
         }
     }
 </script>
 
-<button id="rollBtn" on:click={rollForCard}> Roll : {$currentUser.roll_available} </button>
+<button id="rollBtn" on:click={handleRoll}>
+    Roll : {$currentUser.roll_available}
+</button>
 
 <div id="rolledCards" />
 
@@ -80,7 +99,7 @@
         justify-content: center;
         min-height: 205px;
     }
-    #rollBtn{
+    #rollBtn {
         margin: 20px;
     }
 </style>

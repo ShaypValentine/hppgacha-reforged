@@ -16,6 +16,7 @@
                 username,
                 password,
                 passwordConfirm: password,
+                roll_available: 4,
             };
             const createdUser = await pb.collection("users").create(data);
             await login();
@@ -27,6 +28,7 @@
 
     function signOut() {
         pb.authStore.clear();
+        location.reload();
     }
 </script>
 
@@ -39,7 +41,7 @@
     <form on:submit|preventDefault>
         <input placeholder="Username" type="text" bind:value={username} />
 
-        <input placeholder="Password" type="password" bind:value={password} />
+        <input placeholder="Password" minlength="8" type="password" bind:value={password} />
         <button on:click={signUp}>Sign Up</button>
         <button on:click={login}>Login</button>
     </form>
